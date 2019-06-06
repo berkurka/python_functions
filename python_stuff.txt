@@ -1,0 +1,165 @@
+### Pandas Commands ### 
+*** Savings csv***
+df.to_csv('')
+*** Reading csv ***
+df = pd.read_csv('filepath',header=None, sep='\s+',names=['col_1','col_2]).drop('col3', axis=1)
+
+***CREATING DATA FRAME***
+
+final_df = pd.DataFrame() ## Create Empty DataFrame
+df = pd.DataFrame([[1 2 3 4],[11 22 33 44],[12 24 36 48]],columns = ['a','b','c','d']) # Filling Empty DataFrame
+df.loc[0] = [1,2,3]                                                                    # Adding first line to dataFrame with 3 columns
+
+**** Index changes ****
+df.reset_index(level='col_name')                                    ## Reset index to df column
+
+***COLUMNS***
+df.columns = ['column a','column b', 'column c']                    # Change\Insert Column names
+df.drop('col_a', axis=1,inplace= True)                              # Droping Columns:
+    df.rename({'col_a': 'COL_A', 'col_b': 'COL_B'},axis=1, inplace=True)# Renaming using dictonary
+df.columns = [col.lower().replace(' ','_') for col in df.columns]   # Removing Space from existent names
+df.columns = df.columns.str.lower().str.replace(' ','_')            # Removing Space from existent names
+feature_list = [col for col in df.columns if col != 'colname']      # loop through column names
+df = df.apply(pd.to_numeric)                                        # convert all columns of DataFrame
+df2 = df[df.columns.difference(['B', 'D'])]                         # Select all col except B and D
+
+df['new column'] = df[['col1','col2,'col3']].mean(numeric_only=True,axis=1) #Creates new column with mean
+
+
+df.author = df.author.map({'Austen': 1, 'Poe': 0})          #Replacing values for a single column
+df['Austen'] = np.where(df['author'] == 'Austen',1,0)       #Replacing values for a single column
+df['col 1'].fillna(0, inplace=True)                         #Replacing nulls with 0 for a single column
+df.replace(['Austen','Poe'],[0,1],inplace=True)             #Replacing values for all data frame!!!
+
+***ROWS***
+df.iloc[0] = [1,2,3]                          # Change\Insert row values (1,2,3) where row.index==0
+df2.loc[max(df2.index)+1] = [1,2,3]           # Insert new row with values (1,2,3) increments 1 on index
+df['col1'] = df['col1'].map(lambda val: 'new_val1' if val ==0 else 'new_val2' )# Change row values for 1 column
+
+
+****SERIES***************
+df['col1'].notnull()                  ## SELECTING NOT NULL
+
+*** .iLoc *******************
+df.iloc[0,0] = "test"                                                      # Changing value of row 0 and col 0
+df.iloc[row_start:row_end, col_start:col_end]                               # Acessing rows & columns
+
+*** .Loc *******************
+df.loc[[1,2,3],["col1","col2"]]                                       ## Selecting rows by indexes and columns by name
+df.loc[1,"col1"] = 1                                                  ## Inserting value in data frame
+df.loc[(df['column_name'] >= A) & (df['column_name'] <= B)]
+df.loc[df.index.isin(['one','two'])]
+df.loc[~df['column_name'].isin(some_values)]
+
+
+***Filtering & sorting******
+df.index.values.tolist()                                           # List of index values
+df.sort_values("Column Name",ascending=False,na_position='first')  # Orders descending values
+df.select_dtypes(include=['int16', 'int32', 'int64', 'float16', 'float32', 'float64']) #Filtre only numeric part of df
+
+*** Changing data ***
+df.dropna(axis = 0 , inplace = True)                              # Drops rows with na values, axis=1 to drop columns
+df.dropna(subset = ['BsmtFin Type 2'],inplace=True)
+df['col_a'].replace(to_replace='old_value'.0,value='new value',inplace=True)  # Replacing values in chosen colum
+df = pd.concat([df] * 10, axis=0)                                # replicating df 10 times
+admit.loc[admit['admit'] == 1, 'gpa'] += np.random.random(size=admit[admit.admit == 1].shape[0]) # understand what this does
+df.loc[df['col1']=='None','col_to_be_changed'] = 'new value'                ## filter df and change row value
+df['col'].str.replace("\t"," ")                                                                    #removing space and tabs
+numbers_df['numbers'].replace("[^1-9]","", regex=True,inplace=True)      #removing not numerical using regex
+
+
+*** Analyzing data***
+df.isnull().sum()                              #Check total null values per column
+df.isnull().sum().sum()                        #Check total null values in dataFrame
+df2.info()                                     #Checks data types, row counts, non null per column and memory usage
+df.apply(lambda x: x.count(), axis=0)          #Counts non null per column
+df.describe()                                  #Stat summary of int and float data, can change percentiles if needed
+df.describe(include=[np.object])               #Summary for object columns with the most frequent value
+df['col'].value_counts(normalize=True)         #Percentage for each value
+df['col'].value_counts().sort_values(ascending=False)     #Percentage for each value
+df.groupby('col').filter(lambda x: len(x) == 2) # filter only if col value occurs twice
+
+
+def unique_values_per_col(df):                 # Counts how many unique values per column, also prints types
+    unique_count = [df[x].nunique() for x in df.columns]
+    return pd.DataFrame({'Column Name' :df.columns,'dType' : list(df.dtypes) ,'Unique Count' : unique_count})
+
+
+def unique_val_print(df,unique_max=5,is_asc=True):   #Prints unique values
+    for col in df.columns:
+        if df[col].nunique()<=unique_max:
+            print(col)
+            display(pd.DataFrame(df[col].value_counts()).sort_values([col],ascending=is_asc,na_position='first'))
+
+*** Dummies***
+pd.get_dummies(df, columns=['month', 'day'], drop_first=True, inplace=True)  # creating dummy for month and day and deleting 1st
+
+
+
+
+
+## SQL
+from sqlalchemy import create_engine
+import psycopg2
+
+engine = create_engine('postgresql://delta:delta@localhost/base_aluguel')
+df.to_sql("fund_perf_series",engine,schema='imoveis',index=False)
+
+sql = 'SELECT * FROM imoveis.fund_perf_series'
+result_df = pd.read_sql_query(sql, engine)
+result_df.head()
+
+## GUI Commands ###
+
+Creating new folder in GitHub:
+1) create new directory in GitHub website
+2) Open folder in explorer and run git bash.
+3) git clone https//....
+4) git add .
+5) git commit -m "Updating Github folder"
+6) git push origin master
+
+
+pwd 	print working directory.
+cd 	    change directory *(use /c/Users/... , use \ to escape space or use "" if space in path).
+cd ~    goes to home directory
+cd ~/newfolder/ goes to newfolder in "home" directory
+cd ..   goes up 1 level in folder
+open "/C/Program Files (x86)/Notepad++/notepad++.exe" "Comands GUI.txt"
+ls   list files in current directory
+ls -a   shows hidden files in current directory
+touch   create files
+rm      remove files
+mkdir   create dir,
+rm -r   remove dir
+~/      start from home directory
+./      start from current durectory
+cp [original filename] [location for duplicate file]
+mv [original filename] [location to send file]
+git init start monitoring
+git -status check what files are commited
+git add. add all files in folder to index
+git add file1.txt add 1 file to index
+git push  insert local changes into remote repository
+git pull  insert remote repository in local
+git clone https://github.com/YOURUSERNAME/atom.git (vai clonar para o cd, recisa ser um cd que o git nao tenha sido inicializado ainda.)
+git fetch origin
+git reset --hard origin/master
+
+
+***One strategy of collaborating on a shared git repo***
+git checkout master
+git pull
+git checkout -b bernard
+git add ./changed_lesson_repo
+git commit -m 'groomed and pushed a lesson for week X on some thing'
+git push
+git push --set-upstream origin bernard
+--> Go to github create pull request, merge and delete branch.
+--> Creating new branch
+git checkout master
+git pull
+git branch -d douglas
+git checkout -b douglas
+
+git push --set-upstream origin bernard_final
